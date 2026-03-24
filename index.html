@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiOneEarth - الدفع</title>
+
+    <!-- ربط Pi SDK -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding-top: 60px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+        #payButton {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 25px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>إتمام المرحلة 10 من التطوير</h1>
+
+<button id="payButton">ادفع 0.01 Pi الآن</button>
+
+<div id="status"></div>
+
+<script>
+    // تهيئة Pi SDK
+    const Pi = window.Pi;
+    Pi.init({ version: "2.0" });
+
+    const payButton = document.getElementById("payButton");
+    const statusDiv = document.getElementById("status");
+
+    payButton.addEventListener("click", function () {
+
+        statusDiv.textContent = "جارٍ بدء عملية الدفع...";
+
+        Pi.createPayment({
+            amount: 0.01,
+            memo: "مرحلة 10",
+            metadata: { orderId: "12345" }
+        }, {
+            onReadyForServerApproval: function (paymentId) {
+                statusDiv.textContent = "بانتظار تأكيد السيرفر...";
+            },
+            onReadyForServerCompletion: function (paymentId, txid) {
+                statusDiv.textContent = "تم الدفع بنجاح ✅";
+            },
+            onCancel: function (paymentId) {
+                statusDiv.textContent = "تم إلغاء العملية ❌";
+            },
+            onError: function (error) {
+                statusDiv.textContent = "خطأ: " + error;
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
