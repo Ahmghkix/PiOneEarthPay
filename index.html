@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Metadata -->
+  <title>OneEarth</title>
+  <meta name="description" content="A global community using Pi for a better planet">
+
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkgreen;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🌍 OneEarth</h1>
+  <p>ادعم المشروع وادفع 0.01 Pi</p>
+
+  <button onclick="pay()">ادفع 0.01 Pi</button>
+
+  <script>
+    Pi.init({ version: "2.0" });
+
+    async function pay() {
+      try {
+        // تسجيل الدخول
+        await Pi.authenticate(['payments']);
+
+        // إنشاء الدفع
+        const payment = await Pi.createPayment({
+          amount: 0.01,
+          memo: "OneEarth Support",
+          metadata: { type: "donation" }
+        }, {
+          onReadyForServerApproval: function(paymentId) {
+            console.log("جاهز للموافقة:", paymentId);
+          },
+          onReadyForServerCompletion: function(paymentId, txid) {
+            console.log("تم الدفع:", paymentId, txid);
+          },
+          onCancel: function(paymentId) {
+            console.log("تم الإلغاء", paymentId);
+          },
+          onError: function(error) {
+            console.error("خطأ:", error);
+          }
+        });
+
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  </script>
+
+</body>
+</html>
