@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pi Payment Test</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+
+<body style="text-align:center; font-family:Arial; margin-top:50px;">
+
+  <h2>💰 تجربة الدفع بـ Pi</h2>
+
+  <button onclick="payWithPi()" style="padding:15px; font-size:18px;">
+    ادفع 1 Pi
+  </button>
+
+  <script>
+    // تهيئة Pi SDK
+    Pi.init({
+      version: "2.0",
+      sandbox: true // خليها true للتجربة
+    });
+
+    let paymentInProgress = false;
+
+    function payWithPi() {
+
+      if (paymentInProgress) {
+        alert("⚠️ هناك عملية دفع جارية");
+        return;
+      }
+
+      paymentInProgress = true;
+
+      Pi.createPayment({
+        amount: 1, // ✅ 1 Pi
+        memo: "Test Payment 1 Pi",
+        metadata: {
+          orderId: Date.now() // مهم جدا: طلب جديد كل مرة
+        }
+
+      }, {
+
+        onReadyForServerApproval: function(paymentId) {
+          console.log("جاهز للموافقة:", paymentId);
+        },
+
+        onReadyForServerCompletion: function(paymentId, txid) {
+          console.log("تم الدفع:", paymentId, txid);
+          alert("✅ تم الدفع بنجاح");
+          paymentInProgress = false;
+        },
+
+        onCancel: function(paymentId) {
+          console.log("تم الإلغاء:", paymentId);
+          alert("❌ تم إلغاء الدفع أو انتهت المهلة");
+          paymentInProgress = false;
+        },
+
+        onError: function(error, payment) {
+          console.error("خطأ:", error);
+          alert("⚠️ حدث خطأ في الدفع");
+          paymentInProgress = false;
+        }
+
+      });
+    }
+  </script>
+
+</body>
+</html>
